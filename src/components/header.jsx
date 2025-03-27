@@ -11,13 +11,18 @@ import {
   InputAdornment,
   useTheme,
   useMediaQuery,
-  styled
+  styled,
+  SwipeableDrawer,
+  Paper,
+  List,
+  ListItem,
+  ListItemText,
+  Avatar
 } from '@mui/material';
 import { PlayArrow, Send, KeyboardDoubleArrowDown, Bolt } from '@mui/icons-material';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import ApiService from '../services/request';
 import { useConfig } from '../contexts/config';
-
 
 const AnimatedArrow = styled(Box)({
   position: 'absolute',
@@ -35,60 +40,298 @@ const PriceText = styled(Typography)(({ theme }) => ({
   color: theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.grey[300]
 }));
 
-const HeaderInput = ({ theme, styles, handleValue, valueIA }) => (
-  <Stack
-    direction="column"
-    spacing={1}
-    alignItems="center"
-    sx={{ mt: 6 }}
-  >
-    <Typography
-      variant="body1"
-      component="label"
-      htmlFor="message-input"
-      css={css`
+function DrawerIA({ openIA, setOpenIA, valueIA, handleValue, styles, iaName }) {
+  const [messages, setMessages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef(null);
+  const listRef = useRef(null);
+
+  const MessageBubble = styled(Paper)(({ theme, isUser }) => ({
+    maxWidth: '70%',
+    padding: theme.spacing(1, 2),
+    borderRadius: isUser ? '20px 20px 0 20px' : '20px 20px 20px 0',
+    backgroundColor: isUser ? theme.palette.text.secondary : theme.palette.error.light,
+    color: isUser ? theme.palette.primary.contrastText : theme.palette.background.paper,
+    alignSelf: isUser ? 'flex-end' : 'flex-start',
+    marginBottom: theme.spacing(1),
+  }));
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+      handleSendMessage();
+    }
+  };
+
+  const scrollToBottom = () => {
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    const initialMessage = [
+      {
+        text: `Olá, sou a <b>${iaName}</b>, Inteligência artificial.`,
+        isUser: false,
+      },
+      {
+        text: `Como posso sanar suas dúvidas referente à Wescley, hoje?`,
+        isUser: false
+      }
+    ];
+    setMessages(initialMessage);
+  }, []);
+
+  const handleSendMessage = async () => {
+    if (valueIA.trim() === '') return;
+
+    const newMessage = {
+      text: valueIA,
+      isUser: true,
+    };
+    setMessages((prevMessages) => [...prevMessages, newMessage]);
+    handleValue('');
+
+    setLoading(true);
+
+    /*try {
+      const context = messages
+        .slice(-5)
+        .map((msg) => ({ role: msg.isUser ? 'user' : 'assistant', content: msg.text }));
+
+      context.push({ role: 'user', content: inputValue });
+
+      const response = await axios.post(`${`${process.env.REACT_APP_API_URL}`}/ia`, { content: context });
+
+      const iaResponse = {
+        text: response.data.result,
+        isUser: false,
+      };
+      setMessages((prevMessages) => [...prevMessages, iaResponse]);
+    } catch (error) {
+      console.error('Erro ao enviar mensagem para a IA:', error);
+      const errorMessage = {
+        text: 'Desculpe, ocorreu um erro ao processar sua mensagem. Tente novamente.',
+        isUser: false,
+      };
+      setMessages((prevMessages) => [...prevMessages, errorMessage]);
+    } finally {
+      setLoading(false);
+    }*/
+  };
+
+  return (
+    <SwipeableDrawer
+      anchor="bottom"
+      open={openIA}
+      onClose={() => setOpenIA(false)}
+      slotProps={{
+        paper: {
+          sx: {
+            height: '80vh',
+            overflow: 'visible',
+            borderTopLeftRadius: 28,
+            borderTopRightRadius: 28,
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: -20,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: 120,
+              height: 40,
+              backgroundColor: 'background.paper',
+              borderTopLeftRadius: 28,
+              borderTopRightRadius: 28,
+              zIndex: -1,
+            }
+          }
+        }
+      }}
+    >
+      {/* Título flutuante com borda */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          borderRadius: '50px',
+          boxShadow: 3,
+          p: 1.5,
+          display: 'flex',
+          alignItems: 'center',
+          zIndex: 1,
+          border: '2px solid',  // Borda ao redor do título
+          borderColor: 'error.main',  // Cor da borda (pode ser ajustada conforme necessário)
+        }}
+      >
+        <Bolt color="error" sx={{ fontSize: '1.5rem' }} />
+        <Typography
+          variant="h7"
+          component="span"
+          sx={{
+            ml: 1,
+            fontWeight: 600,
+            color: 'error.light',
+            lineHeight: 1,
+          }}
+        >
+          Inteligência artificial
+        </Typography>
+      </Box>
+
+      <Box sx={{
+        height: '100%',
+        overflow: 'hidden',
+        pr: 1,
+        pt: 2
+      }}>
+        <List
+          ref={listRef}
+          sx={{
+            flexGrow: 1,
+            overflow: 'auto',
+            maxHeight: '60vh',
+            minHeight: '60vh',
+            mb: 2,
+            '&::-webkit-scrollbar': {
+              width: '8px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'background.paper',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: '#888',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb:hover': {
+              background: '#555',
+            },
+          }}
+        >
+          {messages.map((message, index) => (
+            <ListItem
+              key={index}
+              sx={{
+                justifyContent: message.isUser ? 'flex-end' : 'flex-start',
+                alignItems: 'flex-start',
+              }}
+            >
+              {!message.isUser && (
+                <Avatar sx={{ bgcolor: 'error.dark', mr: 1 }}>
+                  {/*<img width="100%" src={Camila} alt="Emily" />*/}
+                </Avatar>
+              )}
+              <MessageBubble isUser={message.isUser}>
+                <ListItemText
+                  primary={
+                    <Typography
+                      component="span"
+                      dangerouslySetInnerHTML={{ __html: message.text }}
+                    />
+                  }
+                />
+              </MessageBubble>
+              {message.isUser && (
+                <Avatar sx={{ bgcolor: 'text.dark', ml: 1 }} />
+              )}
+            </ListItem>
+          ))}
+        </List>
+
+      </Box>
+
+      <Box sx={{ p: 2, display: 'flex', justifyContent: 'center' }}>
+        <TextField
+          variant="outlined"
+          placeholder="Digite sua mensagem..."
+          css={styles.inputField}
+          value={valueIA}
+          onChange={(e) => handleValue(e?.target?.value)}
+          onKeyDown={handleKeyPress}
+          sx={{ width: '70vw' }}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton color="primary" css={styles.sendButton} onClick={handleSendMessage}>
+                  <Send />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+      </Box>
+    </SwipeableDrawer>
+  );
+}
+
+
+const HeaderInput = ({ theme, styles, handleValue, valueIA, iaName }) => {
+  const [openIA, setOpenIA] = useState(false);
+
+  return (<>
+    <Stack
+      direction="column"
+      spacing={1}
+      alignItems="center"
+      sx={{ mt: 6 }}
+    >
+      <Typography
+        variant="body1"
+        component="label"
+        htmlFor="message-input"
+        css={css`
         margin-left: ${theme.spacing(2)};
         color: ${theme.palette.text.secondary};
         font-weight: 500;
       `}
-    >
-      Melhor que ler...
-    </Typography>
+      >
+        Melhor que ler...
+      </Typography>
 
-    <Box>
-      <AnimatedArrow>
-        <Bolt
-          sx={{
-            width: 71,
-            color: theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.grey[300]
-          }}
-        />
-      </AnimatedArrow>
-      <PriceText>
-        Pergunte à iA
-      </PriceText>
-    </Box>
+      <Box>
+        <AnimatedArrow>
+          <Bolt
+            sx={{
+              width: 71,
+              color: theme.palette.mode === 'light' ? theme.palette.grey[800] : theme.palette.grey[300]
+            }}
+          />
+        </AnimatedArrow>
+        <PriceText>
+          Pergunte à iA
+        </PriceText>
+      </Box>
 
-    <TextField
-      variant="outlined"
-      placeholder="Digite sua mensagem..."
-      css={styles.inputField}
-      value={valueIA}
-      onChange={(e) => handleValue(e?.target?.value)}
-      InputProps={{
-        endAdornment: (
-          <InputAdornment position="end">
-            <IconButton color="primary" css={styles.sendButton}>
-              <Send />
-            </IconButton>
-          </InputAdornment>
-        ),
-      }}
-    />
-  </Stack>
-);
+      <TextField
+        variant="outlined"
+        placeholder="Digite sua mensagem..."
+        css={styles.inputField}
+        value={valueIA}
+        onChange={(e) => handleValue(e?.target?.value)}
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton color="primary" css={styles.sendButton} onClick={() => setOpenIA(true)}>
+                <Send />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </Stack>
+    <DrawerIA openIA={openIA} setOpenIA={setOpenIA} valueIA={valueIA} handleValue={handleValue} styles={styles} iaName={iaName} />
+  </>);
+};
 
-export default function CallToActionWithVideo() {
+export default function Header({ scrollToSection }) {
   const theme = useTheme();
   const { config, setConfig } = useConfig();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
@@ -192,7 +435,7 @@ export default function CallToActionWithVideo() {
 
   // Componente de Conteúdo do Header
   const HeaderContent = () => (
-    <Box css={css`flex: 1;`}>
+    <Box css={css`flex: 1;`} id="header">
       <Typography variant="h1" css={styles.heading}>
         <Box component="span" sx={{ fontSize: { xs: 40, md: 60 } }} color="error.main">
           Olá 👋
@@ -227,6 +470,7 @@ export default function CallToActionWithVideo() {
             border-radius: 24px;
             padding: ${theme.spacing(1.5)} ${theme.spacing(4)};
           `}
+          onClick={() => scrollToSection('about')}
         >
           <KeyboardDoubleArrowDown /> Sobre mim
         </Button>
@@ -309,7 +553,7 @@ export default function CallToActionWithVideo() {
         <HeaderContent />
         <HeaderVisual />
       </Stack>
-      <HeaderInput theme={theme} styles={styles} handleValue={handleValue} valueIA={valueIA} />
+      <HeaderInput theme={theme} styles={styles} handleValue={handleValue} valueIA={valueIA} iaName={config?.iaName} />
     </Container>
   );
 }

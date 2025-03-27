@@ -66,7 +66,7 @@ export default function About() {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 8 }}>
+    <Container maxWidth="lg" sx={{ py: 8 }} id="about">
       <Chip
         label="Sobre mim"
         color="error"

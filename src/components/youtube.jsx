@@ -76,7 +76,14 @@ export default function Youtube() {
 
       <Grid container spacing={2} width="100%">
         {youtubeVideos.map((video, index) => (
-          <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index} sx={{ display: 'flex' }}>
+          <Grid
+            size={{ xs: 12, sm: 6, md: 4 }}
+            key={index}
+            sx={{
+              display: 'flex',
+              boxShadow: `2px 2px 5px grey`,
+              borderRadius: 5
+            }}>
             <Card
               variant="outlined"
               sx={{
@@ -84,6 +91,7 @@ export default function Youtube() {
                 flexDirection: 'column',
                 justifyContent: 'space-between',
                 flexGrow: 1,
+                borderRadius: 5
               }}
             >
               <CardContent>
@@ -98,7 +106,7 @@ export default function Youtube() {
                   allowFullScreen
                   style={{ borderRadius: 10 }}
                 />
-                <div style={{textAlign: 'left'}} dangerouslySetInnerHTML={{ __html: video.description }} />
+                <div style={{ textAlign: 'left' }} dangerouslySetInnerHTML={{ __html: video.description }} />
               </CardContent>
               <Box
                 sx={{
