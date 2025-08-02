@@ -1,0 +1,32 @@
+const skills = [
+  { name: 'JavaScript', icon: 'javascript' },
+  { name: 'TypeScript', icon: 'typescript' },
+  { name: 'React.js', icon: 'react' },
+  { name: 'Angular', icon: 'angular' },
+  { name: 'NodeJs', icon: 'node' },
+  { name: 'PHP', icon: 'php' },
+  { name: 'Material UI', icon: 'mui' },
+  { name: 'Bootstrap', icon: 'bootstrap' },
+  { name: 'Axios', icon: 'axios' },
+  { name: 'Socket.io', icon: 'socket' },
+  { name: 'Laravel', icon: 'laravel' },
+  { name: 'Yii', icon: 'yii' },
+  { name: 'Pawn', icon: 'pawn' },
+  { name: 'C', icon: 'c' },
+  { name: 'Lua', icon: 'lua' },
+  { name: 'Puppeteer', icon: 'puppeteer' },
+  { name: 'Playwright', icon: 'playwright' },
+  { name: 'FaceAPI.js', icon: 'faceapi' },
+  { name: 'NLP', icon: 'nlp' },
+  { name: 'Sketchware', icon: 'sketchware' },
+  { name: 'WHMCS', icon: 'whmcs' },
+  { name: 'Wordpress', icon: 'wordpress' },
+  { name: 'Arduíno/ESP', icon: 'arduino' },
+  { name: 'AI (Speech, Text, Face math, etc...)', icon: 'ai' },
+  { name: 'API RESTful', icon: 'api' },
+  { name: 'Cloudflare', icon: 'cloudflare' },
+  { name: 'AWS', icon: 'aws' },
+  { name: 'Google Gemini e outros', icon: 'gemini' }
+];
+
+export default skills;
