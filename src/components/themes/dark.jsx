@@ -6,11 +6,11 @@ export const darkTheme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#c96460ff',
+      main: '#6BA4FE',
       contrastText: '#121212',
     },
     secondary: {
-      main: '#974c4aff',
+      main: '#E1ECFE',
       contrastText: '#121212',
     },
     background: {

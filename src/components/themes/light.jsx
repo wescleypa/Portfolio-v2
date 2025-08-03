@@ -6,11 +6,11 @@ export const lightTheme = createTheme({
   palette: {
     mode: 'light',
     primary: {
-      main: '#c96460ff',
+      main: '#6BA4FE',
       contrastText: '#ffffff',
     },
     secondary: {
-      main: 'rgba(136, 17, 13, 1)',
+      main: '#E1ECFE',
       contrastText: '#ffffff',
     },
     background: {

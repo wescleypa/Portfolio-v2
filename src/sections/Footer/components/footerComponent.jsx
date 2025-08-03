@@ -3,6 +3,7 @@ import { TermsModal, PrivacyModal, CookiesModal } from '../../../components/Lega
 import { socialLinks } from '../footerData';
 import useScrollToSection from '../../../hooks/useScrollToSection';
 import { useState } from 'react';
+import { ChangeCircle } from '@mui/icons-material';
 
 const FooterComponent = () => {
   const { scrollTo } = useScrollToSection();
@@ -121,6 +122,10 @@ const FooterComponent = () => {
 
         <Typography variant="body2" color="text.secondary">
           Desenvolvido com ❤️ utilizando React e Material UI
+        </Typography>
+
+        <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <ChangeCircle sx={{ width: 20 }} /> 2.0.0
         </Typography>
       </Box>
 
